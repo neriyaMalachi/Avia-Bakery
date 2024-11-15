@@ -1,11 +1,8 @@
-import type { Metadata } from "next";
+"use client"
 import "./globals.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-export const metadata: Metadata = {
-  title: "Avia Bakery",
-  description: "Avia Bakery #1",
-};
-
+const queryClient = new QueryClient();
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -13,7 +10,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </body>
     </html>
   );
 }

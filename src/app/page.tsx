@@ -1,24 +1,29 @@
-'use client';
+"use client";
 import Image from "next/image";
 import { useState } from "react";
-import logo from '@/app/assets/logo.png'
+import logo from "@/app/assets/logo.png";
 import Link from "next/link";
+import { LoginService } from "./services/loginServices/loginService";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);  // מצב טוען
+  const route = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true); // מתחילים טעינה
 
-    // בקשת אימות מדומה
-    if (email === "user@bakeryavia.com" && password === "password123") {
-      const mockToken = "mocked-jwt-token";
-      setToken(mockToken);
-      alert("התחברת בהצלחה! טוקן: " + mockToken);
+    const results = await LoginService(password, email);
+    setLoading(false); // סיימנו טעינה
+
+    if (results) {
+      route.push("/pages/home_page");
     } else {
       alert("פרטי ההתחברות אינם נכונים. נסה שוב.");
+      route.push("/");
     }
   };
 
@@ -38,7 +43,10 @@ const Login = () => {
 
         <form onSubmit={handleLogin} className="space-y-6 text-right">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               כתובת אימייל
             </label>
             <input
@@ -53,7 +61,10 @@ const Login = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               סיסמה
             </label>
             <input
@@ -70,22 +81,52 @@ const Login = () => {
           <button
             type="submit"
             className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            disabled={loading} // אם בטעינה, disable הכפתור
           >
-            התחבר
+            {loading ? (
+              <div className="flex justify-center items-center">
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeWidth="4"
+                    d="M4 12a8 8 0 1 1 16 0 8 8 0 0 1-16 0z"
+                  ></path>
+                </svg>
+              </div>
+            ) : (
+              "התחבר"
+            )}
           </button>
         </form>
 
-        {token && (
-          <p className="mt-4 text-sm text-green-600">
-            התחברת בהצלחה! טוקן: {token}
-          </p>
-        )}
-
         <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-200">
-          <Link href="/pages/forget_password" className="text-sm text-blue-600 hover:underline">
-          ? שכחת סיסמה
+          <Link
+            href="/pages/forget_password"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            ? שכחת סיסמה
           </Link>
-          <Link href={"https://wa.link/7wjrj1"} className="text-sm text-blue-600 hover:underline">
+          <Link
+            href={"https://wa.link/7wjrj1"}
+            className="text-sm text-blue-600 hover:underline"
+          >
             יצירת קשר
           </Link>
         </div>
