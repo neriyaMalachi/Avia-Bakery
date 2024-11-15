@@ -3,10 +3,13 @@ import { NextResponse } from "next/server";
 
 export async function POST() {
   const cookieStore = cookies();
+
   const token = cookieStore.get("authToken");
+  console.log("route validation", token);
+
   if (token) {
     return NextResponse.json(token);
   } else {
-    return NextResponse.json("Failed to fetch token");
+    return ;
   }
 }
